@@ -1,109 +1,128 @@
+/* servTCPConcTh2.c - Exemplu de server TCP concurent care deserveste clientii
+   prin crearea unui thread pentru fiecare client.
+   Asteapta un numar de la clienti si intoarce clientilor numarul incrementat.
+	Intoarce corect identificatorul din program al thread-ului.
+  
+   
+   Autor: Lenuta Alboaie  <adria@infoiasi.ro> (c)2009
+*/
+
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <malloc.h>
-#include <string.h>
-#include <dirent.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
-#ifndef SERVER
-#define SERVER
+#include <errno.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <pthread.h>
+#define MSG_LENGTH 100
 
-#define PORT 4412
+#define PORT 2908
 
-char connectedClients[10][30];
-int countConnectedClients = 0;
-char i[30];
+/* codul de eroare returnat de anumite apeluri */
+extern int errno;
+int ON=1;
 
-struct loginInput{
-	char username[20];
-	char password[20];
-};
+typedef struct Client{
+	int idThread; //id-ul thread-ului tinut in evidenta de acest program
+	int cl; //descriptorul intors de accept
+	char ID[2];
+}Client;
 
-struct loginInput L;
+Client clients[10];
+int connectedClients = -1;
 
-void startServer(){
-     int sockfd, ret;
-	 struct sockaddr_in serverAddr;
+static void *client_handler(void *); /* functia executata de fiecare thread ce realizeaza comunicarea cu clientii */
+void raspunde(void *);
 
-	int newSocket;
-	struct sockaddr_in newAddr;
+int main (){
+  struct sockaddr_in server;	// structura folosita de server
+  struct sockaddr_in from;	
+  int nr;		//mesajul primit de trimis la client 
+  int sd;		//descriptorul de socket 
+  int pid;
+  pthread_t th[100];    //Identificatorii thread-urilor care se vor crea
+  
+  if ((sd = socket (AF_INET, SOCK_STREAM, 0)) == -1)
+    {
+      perror ("[server]Eroare la socket().\n");
+      return errno;
+    }
 
-	socklen_t addr_size;
+  setsockopt(sd,SOL_SOCKET,SO_REUSEADDR,&ON,sizeof(ON));
+  
+  /* pregatirea structurilor de date */
+  bzero (&server, sizeof (server));
+  bzero (&from, sizeof (from));
+  
+    server.sin_family = AF_INET;	
+    server.sin_addr.s_addr = htonl (INADDR_ANY);
+    server.sin_port = htons (PORT);
+  
+  if (bind (sd, (struct sockaddr *) &server, sizeof (struct sockaddr)) == -1){
+	perror ("[server]Eroare la bind().\n");
+	return errno;
+  }
 
-	char buffer[1024];
+  if (listen (sd, 10) == -1){
+      perror ("[server]Eroare la listen().\n");
+      return errno;
+  }
+  
+  while (1){
+      int client;
+      Client * td;   
+      int length = sizeof (from);
 
-	pid_t childpid;
+      printf ("[server]Asteptam la portul %d...\n",PORT);
+      fflush (stdout);
 
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-	if(sockfd < 0){
-		close(sockfd);
-		printf("[SERVER]Eroare la crearea socket-ului\n");
-		exit(1);
-	}
-	printf("[SERVER]Socket-ul server-ului a fost creat!\n");
+      if ((client = accept (sd, (struct sockaddr *) &from, &length)) < 0){
+		perror ("[server]Eroare la accept().\n");
+		continue;
+	  }
+	    
+	  connectedClients++;
+	  clients[connectedClients].idThread = connectedClients;
+	  clients[connectedClients].cl = client;
 
-	memset(&serverAddr, '\0', sizeof(serverAddr));
-	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_port = htons(PORT);
-	serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	  td=(struct Client*)malloc(sizeof(struct Client));	
+	  td->idThread=connectedClients;
+	  td->cl=client;
+	
+	  pthread_create(&th[connectedClients], NULL, &client_handler, td);	      
+				
+	}   
+};		
 
-	ret = bind(sockfd, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
-	if(ret < 0){
-		printf("[SERVER]Eroare la bind\n");
-		exit(1);
-	}
-	printf("[SERVER]Bind la port-ul %d\n", PORT);
+static void *client_handler(void * arg){		
+	struct Client tdL; 
+	int receiveNumber = 0;
+	tdL = *((struct Client*)arg);	
+	char msg[MSG_LENGTH];
+	while(read (tdL.cl, &msg,sizeof(char)*MSG_LENGTH) > 0){
+		receiveNumber++;
+		if(receiveNumber == 1){
+			printf("[SERVER]Setez tipul clientului %d -> %s\n",tdL.idThread,msg);
+			sprintf(clients[tdL.idThread].ID,"%s",msg);
+		} else {
+			char msg_to_send[100];
+			sprintf(msg_to_send,"[%s]%s",clients[tdL.idThread].ID,msg);
 
-	if(listen(sockfd, 10) == 0){
-		printf("[SERVER]Listening....\n");
-	}else{
-		close(sockfd);
-		printf("[SERVER]Eroare la bind!\n");
-	}
-
-
-	while(1){
-		newSocket = accept(sockfd, (struct sockaddr*)&newAddr, &addr_size);
-		if(newSocket < 0){
-			exit(1);
-		}
-
-		countConnectedClients++;
-		printf("[SERVER]Clientul cu ip-ul %s:%d s-a conectat!\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
-
-		if((childpid = fork()) == 0){
-			close(sockfd);
-
-			while(1){
-				sprintf(i,"%d",countConnectedClients);
-				int checkClientConnection = recv(newSocket, buffer, 1024, 0);
-				if(strcmp(buffer, ":exit") == 0 || checkClientConnection == 0){
-					printf("[SERVER]Clientul cu ip-ul %s:%d s-a deconectat!\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
-					break;
-				}  else if(strcmp(buffer, "?")==0){
-					send(newSocket,i,strlen(i),0);
-					printf("Fsalut\n");
-				} else if(strcmp(buffer,":login")==0){
-					recv(newSocket, L.username, 20, 0);
-					recv(newSocket, L.password, 20, 0);
-					printf("[SERVER]%s %s\n",L.username,L.password);
-		     	} else{	
-					printf("[SERVER]: %s\n", buffer);
-					send(newSocket, buffer, strlen(buffer), 0);
-					bzero(buffer, sizeof(buffer));
+			for(int i = 0 ; i <= connectedClients ; i++){
+				if(clients[i].idThread == tdL.idThread) continue;
+				if (write (clients[i].cl, &msg_to_send, sizeof(char)*MSG_LENGTH) <= 0){
+					printf("[Client %d] ",tdL.idThread);
+					perror ("Eroare la write() catre client.\n");
 				}
 			}
 		}
-
+		fflush (stdout);		 
+		// pthread_detach(pthread_self());		
 	}
-
-	close(newSocket);
-
-}
-
-#endif
+	/* am terminat cu acest client, inchidem conexiunea */
+	close ((intptr_t)arg);
+	return(NULL);	
+};
