@@ -16,7 +16,7 @@ def decrypt_key_wanted(data):
     if receive_number == 1:
         crypto = ECB(k3)
         print(f'Decrypted key with k3 {crypto.decrypt(data)}')
-
+#test
 def receive():
     while a.signal:
         try:
