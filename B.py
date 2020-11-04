@@ -25,6 +25,7 @@ def decrypt_key_wanted(data):
     global receive_number
     if receive_number == 2:
         crypto = ECB(k3)
+        b.socket.sendall(b'START')
         print(f'Decrypted key with k3 {crypto.decrypt(data)}')
 
 def receive():

@@ -24,6 +24,8 @@ def b_handler(message,request_number):
     print(f'[B->{request_number}]{message}')
     if request_number == 1:
         send_msg(message,b'KM')
+    if request_number == 2:
+        send_msg(b'B-SEND-START',b'A')
     pass
 
 

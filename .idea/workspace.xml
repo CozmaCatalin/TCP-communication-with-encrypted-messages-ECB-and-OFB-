@@ -3,6 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="27bf2e61-bc32-4d15-9d30-0db5aada5e64" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/B.py" beforeDir="false" afterPath="$PROJECT_DIR$/B.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ECB.py" beforeDir="false" afterPath="$PROJECT_DIR$/ECB.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -204,13 +207,13 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="277" y="55" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1602782630946" />
-    <state x="465" y="236" key="com.intellij.ide.util.TipDialog" timestamp="1604430843489">
+    <state x="465" y="236" key="com.intellij.ide.util.TipDialog" timestamp="1604492474292">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="465" y="236" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1604430843489" />
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1604349193549">
+    <state x="465" y="236" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1604492474292" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1604495397157">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1604349193549" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1604495397157" />
   </component>
 </project>
