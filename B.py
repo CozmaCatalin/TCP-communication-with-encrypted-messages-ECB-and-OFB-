@@ -1,32 +1,38 @@
 from node import Node
 from ECB import ECB
+from OFB import OFB
 import threading
 
 k3 = "3333333333333333"
 b = Node("B")
 receive_number = 0
-
+encryption_mode = None
 def receive_counter(data):
     global receive_number
     receive_number+=1
     print(f'[receive->{receive_number}]{data}')
 
 def encryption_mode_receive(message):
-    if message == b'ECB':
-        key = b'K1'
-        b.socket.sendall(key)
-        return
-    if message == b'OFB':
-        key = b'K2'
-        b.socket.sendall(key)
-        return
+    global receive_number,encryption_mode
+    if receive_number == 1:
+        encryption_mode = message
+        if message == b'ECB':
+            key = b'K1'
+            b.socket.sendall(key)
+        if message == b'OFB':
+            key = b'K2'
+            b.socket.sendall(key)
 
 def decrypt_key_wanted(data):
-    global receive_number
+    global receive_number,encryption_mode
     if receive_number == 2:
-        crypto = ECB(k3)
+        if encryption_mode == b'ECB':
+            crypto = ECB(k3)
+            print(f'Decrypted K1 with k3 {crypto.decrypt(data)} ECB mode from -> {str(data)}')
+        else:
+            crypto = OFB(k3,b'0'*16)
+            print(f'Decrypted K2 with k3 {crypto.decrypt(data)} OFB mode from -> {str(data)}')
         b.socket.sendall(b'START')
-        print(f'Decrypted key with k3 {crypto.decrypt(data)}')
 
 def receive():
     while b.signal:

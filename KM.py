@@ -1,5 +1,6 @@
 from node import Node
 from ECB import ECB
+from OFB import OFB
 import threading
 
 keys = {
@@ -25,8 +26,16 @@ def receive_counter(data):
 def send_encrypted_key():
     global receive_number,key_wanted
     if receive_number == 2:
-        crypto = ECB(keys["K3"])
-        km.socket.sendall(crypto.encrypt(keys[key_wanted]))
+        if key_wanted == "K1":
+            crypto = ECB(keys["K3"])
+            encrypt = crypto.encrypt(keys[key_wanted])
+            km.socket.sendall(encrypt)
+            print("Trimit cheia K1 criptata cu K3 prin ECB ->" + str(encrypt))
+        else:
+            crypto = OFB(keys["K3"],b'0'*16)
+            encrypt = crypto.encrypt(keys[key_wanted])
+            km.socket.sendall(encrypt)
+            print("Trimit cheia K2 criptata cu K3 prin OFB ->" + str(encrypt))
 
 def receive():
     while km.signal:
