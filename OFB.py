@@ -12,24 +12,17 @@ class OFB:
         blocks = message_split_to_blocks(put_empty_bytes(message.encode()))
         encrypted_blocks = []
         for block in blocks:
-            self.iv = self.aes_tool.encrypt(self.encode_key)
+            self.iv = self.aes_tool.encrypt(self.iv)
             iv_byte_array = bytearray(copy.copy(self.iv))
             for i in range(16):
                 iv_byte_array[i] = iv_byte_array[i]^block[i]
             encrypted_blocks.append(bytes(iv_byte_array))
-            self.iv = bytes(iv_byte_array)
-
         self.iv = b'0'*16
-        return b''.join(encrypted_blocks)
+        return encrypted_blocks
 
-    def decrypt(self,encrypted_message):
-        blocks = message_split_to_blocks(encrypted_message)
-        decrypted_blocks = []
-        for block in blocks:
-            self.iv = self.aes_tool.encrypt(self.encode_key)
-            iv_byte_array = bytearray(copy.copy(self.iv))
-            for i in range(16):
-                iv_byte_array[i] = iv_byte_array[i]^block[i]
-            decrypted_blocks.append(bytes(iv_byte_array))
-            self.iv = bytes(iv_byte_array)
-        return delete_empty_bytes(b''.join(decrypted_blocks))
+    def decrypt(self,block):
+        self.iv = self.aes_tool.encrypt(self.iv)
+        iv_byte_array = bytearray(copy.copy(self.iv))
+        for i in range(16):
+            iv_byte_array[i] = iv_byte_array[i]^block[i]
+        return delete_empty_bytes(bytes(iv_byte_array))

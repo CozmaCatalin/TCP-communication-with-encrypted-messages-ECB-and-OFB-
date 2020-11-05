@@ -21,7 +21,7 @@ def set_key_wanted(data):
 def receive_counter(data):
     global receive_number
     receive_number+=1
-    print(f'[receive->{receive_number}]{data}')
+    print(f'[RECEIVE->{receive_number}]{data}')
 
 def send_encrypted_key():
     global receive_number,key_wanted
@@ -29,13 +29,13 @@ def send_encrypted_key():
         if key_wanted == "K1":
             crypto = ECB(keys["K3"])
             encrypt = crypto.encrypt(keys[key_wanted])
-            km.socket.sendall(encrypt)
-            print("Trimit cheia K1 criptata cu K3 prin ECB ->" + str(encrypt))
+            km.socket.sendall(encrypt[0])
+            print("Sending K1 encrypted with K3 using ECB ->" + str(encrypt[0]))
         else:
             crypto = OFB(keys["K3"],b'0'*16)
             encrypt = crypto.encrypt(keys[key_wanted])
-            km.socket.sendall(encrypt)
-            print("Trimit cheia K2 criptata cu K3 prin OFB ->" + str(encrypt))
+            km.socket.sendall(encrypt[0])
+            print("Sending K2 encrypted with K3 using OFB ->" + str(encrypt[0]))
 
 def receive():
     while km.signal:

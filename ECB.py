@@ -8,9 +8,9 @@ class ECB:
 
     def encrypt(self,message):
         blocks = message_split_to_blocks(put_empty_bytes(message.encode()))
-        return b''.join([self.aes_tool.encrypt(block) for block in blocks])
+        return [self.aes_tool.encrypt(block) for block in blocks]
 
-    def decrypt(self,encrypted_message):
-        blocks = message_split_to_blocks(encrypted_message)
-        return delete_empty_bytes(b''.join([self.aes_tool.decrypt(block) for block in blocks]))
+    def decrypt(self,block):
+        return delete_empty_bytes(self.aes_tool.decrypt(block))
+
 

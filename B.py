@@ -6,11 +6,15 @@ import threading
 k3 = "3333333333333333"
 b = Node("B")
 receive_number = 0
+key_received = None
 encryption_mode = None
+encryption_class = None
+
 def receive_counter(data):
     global receive_number
     receive_number+=1
-    print(f'[receive->{receive_number}]{data}')
+    if not receive_number > 2:
+        print(f'[RECEIVE->{receive_number}]{data}')
 
 def encryption_mode_receive(message):
     global receive_number,encryption_mode
@@ -24,15 +28,38 @@ def encryption_mode_receive(message):
             b.socket.sendall(key)
 
 def decrypt_key_wanted(data):
-    global receive_number,encryption_mode
+    global receive_number,encryption_mode,key_received
     if receive_number == 2:
         if encryption_mode == b'ECB':
             crypto = ECB(k3)
-            print(f'Decrypted K1 with k3 {crypto.decrypt(data)} ECB mode from -> {str(data)}')
+            key_received = crypto.decrypt(data).decode()
+            print(f'Decrypted K1 with k3 {key_received} ECB mode from -> {str(data)}')
         else:
             crypto = OFB(k3,b'0'*16)
-            print(f'Decrypted K2 with k3 {crypto.decrypt(data)} OFB mode from -> {str(data)}')
+            key_received = crypto.decrypt(data).decode()
+            print(f'Decrypted K2 with k3 {key_received} OFB mode from -> {str(data)}')
         b.socket.sendall(b'START')
+
+def set_decrypt_class():
+    global encryption_mode,encryption_class,key_received
+    if encryption_mode == b'ECB':
+        print("\n====Setting decrypt class ECB and start decrypting the blocks with key " + key_received + "====")
+        encryption_class = ECB(key_received)
+    else:
+        print("\n====Setting decrypt class ECB and start decrypting the blocks with key " + key_received + "====")
+        encryption_class = OFB(key_received,b'0'*16)
+
+def decrypt_message(data):
+    global encryption_mode,key_received,encryption_class
+    if receive_number == 3:
+        set_decrypt_class()
+    if receive_number > 2:
+        if encryption_mode == b'ECB':
+            decrypt_block = encryption_class.decrypt(data).decode()
+            print(f'[ECB Block->{receive_number-2}]{str(data)} -> {str(decrypt_block)}')
+        else:
+            decrypt_block = encryption_class.decrypt(data).decode()
+            print(f'[OFB Block->{receive_number-2}]{str(data)} -> {str(decrypt_block)}')
 
 def receive():
     while b.signal:
@@ -41,8 +68,9 @@ def receive():
             receive_counter(data)
             encryption_mode_receive(data)
             decrypt_key_wanted(data)
+            decrypt_message(data)
         except Exception as e:
-            print("You have been disconnected from the serve " + str(e))
+            print("You have been disconnected from the server " + str(e))
             b.signal = False
 
 receive_thread = threading.Thread(target=receive)

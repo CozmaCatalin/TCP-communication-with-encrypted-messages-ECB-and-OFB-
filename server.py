@@ -1,5 +1,6 @@
 import socket
 import threading
+import time
 
 nodes = []
 total_nodes = 0
@@ -19,6 +20,9 @@ def a_handler(message, request_number):
             send_msg(b'K1', b'KM')
         else:
             send_msg(b'K2', b'KM')
+    if request_number > 1:
+        send_msg(message,b'B')
+
 
 def b_handler(message,request_number):
     print(f'[B->{request_number}]{message}')
