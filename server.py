@@ -1,10 +1,9 @@
 import socket
 import threading
-import time
 
 nodes = []
 total_nodes = 0
-
+is_running = True
 
 def send_msg(message, node_type):
     global nodes
@@ -22,6 +21,9 @@ def a_handler(message, request_number):
             send_msg(b'K2', b'KM')
     if request_number > 1:
         send_msg(message,b'B')
+        if message == b'STOP':
+            print("EXIT!")
+            quit(0)
 
 
 def b_handler(message,request_number):

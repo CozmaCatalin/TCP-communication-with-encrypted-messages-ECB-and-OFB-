@@ -55,6 +55,7 @@ def start_crypting_file_text_message(data):
                 time.sleep(sleep_time)
                 print(f'[OFB Block->{i}] {str(block)}')
                 a.socket.sendall(block)
+        a.socket.sendall(b'STOP')
 
 def receive():
     while a.signal:

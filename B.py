@@ -9,6 +9,7 @@ receive_number = 0
 key_received = None
 encryption_mode = None
 encryption_class = None
+decrypted_message = ""
 
 def receive_counter(data):
     global receive_number
@@ -43,23 +44,30 @@ def decrypt_key_wanted(data):
 def set_decrypt_class():
     global encryption_mode,encryption_class,key_received
     if encryption_mode == b'ECB':
-        print("\n====Setting decrypt class ECB and start decrypting the blocks with key " + key_received + "====")
+        print("\n=============Setting decrypt class ECB and start decrypting the blocks with key " + key_received + "=============")
         encryption_class = ECB(key_received)
     else:
-        print("\n====Setting decrypt class ECB and start decrypting the blocks with key " + key_received + "====")
+        print("\n=============Setting decrypt class ECB and start decrypting the blocks with key " + key_received + "=============")
         encryption_class = OFB(key_received,b'0'*16)
 
 def decrypt_message(data):
-    global encryption_mode,key_received,encryption_class
+    global encryption_mode,key_received,encryption_class,decrypted_message
     if receive_number == 3:
         set_decrypt_class()
     if receive_number > 2:
-        if encryption_mode == b'ECB':
-            decrypt_block = encryption_class.decrypt(data).decode()
-            print(f'[ECB Block->{receive_number-2}]{str(data)} -> {str(decrypt_block)}')
+        if data != b'STOP':
+            if encryption_mode == b'ECB':
+                decrypt_block = encryption_class.decrypt(data).decode()
+                decrypted_message += decrypt_block
+                print(f'[ECB Block->{receive_number-2}]{str(data)} -> {str(decrypt_block)}')
+            else:
+                decrypt_block = encryption_class.decrypt(data).decode()
+                decrypted_message += decrypt_block
+                print(f'[OFB Block->{receive_number-2}]{str(data)} -> {str(decrypt_block)}')
         else:
-            decrypt_block = encryption_class.decrypt(data).decode()
-            print(f'[OFB Block->{receive_number-2}]{str(data)} -> {str(decrypt_block)}')
+            print('\n')
+            print("============= Decryption DONE ! =============")
+            print(decrypted_message)
 
 def receive():
     while b.signal:
