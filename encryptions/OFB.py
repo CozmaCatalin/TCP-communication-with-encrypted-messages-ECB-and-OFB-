@@ -1,5 +1,5 @@
 from Crypto.Cipher import AES
-from helpers import delete_empty_bytes,message_split_to_blocks,put_empty_bytes
+from helpers.helpers import delete_empty_bytes,message_split_to_blocks,put_empty_bytes
 import copy
 
 class OFB:

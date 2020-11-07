@@ -1,6 +1,6 @@
-from node import Node
-from ECB import ECB
-from OFB import OFB
+from interfaces.node import Node
+from encryptions.ECB import ECB
+from encryptions.OFB import OFB
 import threading
 
 keys = {

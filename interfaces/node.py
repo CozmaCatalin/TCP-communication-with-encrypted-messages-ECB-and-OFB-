@@ -17,9 +17,5 @@ class Node:
             input("Press any key to quit")
             sys.exit(0)
 
-    def close_node(self):
-        close = "CLOSE"
-        self.socket.sendall(close.encode())
-
 
 
