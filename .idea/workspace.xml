@@ -2,16 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="27bf2e61-bc32-4d15-9d30-0db5aada5e64" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/tests/test3.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/A.py" beforeDir="false" afterPath="$PROJECT_DIR$/A.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/B.py" beforeDir="false" afterPath="$PROJECT_DIR$/B.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ECB.py" beforeDir="false" afterPath="$PROJECT_DIR$/encryptions/ECB.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KM.py" beforeDir="false" afterPath="$PROJECT_DIR$/KM.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OFB.py" beforeDir="false" afterPath="$PROJECT_DIR$/encryptions/OFB.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/helpers/helpers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/node.py" beforeDir="false" afterPath="$PROJECT_DIR$/interfaces/node.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test1.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
